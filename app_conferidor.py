@@ -1,15 +1,64 @@
 import os
+import re
 import sqlite3
 import pandas as pd
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from datetime import datetime, timedelta
 import threading
 import subprocess
 import sys
 import time
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # v1.2 - Sincronização Automática Diária
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+
+def _prefixo_publico():
+    p = (request.headers.get("X-Forwarded-Prefix") or request.script_root or "").strip().rstrip("/")
+    if p and not p.startswith("/"):
+        p = "/" + p
+    return p
+
+
+def _reescrever_html_prefixo(text, prefixo):
+    p = (prefixo or "").rstrip("/")
+    if not p or not text:
+        return text
+    skip = re.escape(p.lstrip("/"))
+    pares = (
+        (rf'(href=")(/)(?!{skip}/)', rf"\1{p}/"),
+        (rf"(href=')(/)(?!{skip}/)", rf"\1{p}/"),
+        (rf'(src=")(/)(?!{skip}/)', rf"\1{p}/"),
+        (rf'(fetch\(")(/)(?!{skip}/)', rf"\1{p}/"),
+        (rf"(fetch\(')(/)(?!{skip}/)", rf"\1{p}/"),
+        (rf"(fetch\(`)(/)(?!{skip}/)", rf"\1{p}/"),
+        (rf"(= ')(/)(?!{skip}/)", rf"\1{p}/"),
+        (rf'(= ")(/)(?!{skip}/)', rf"\1{p}/"),
+        (rf"(= `)(/)(?!{skip}/)", rf"\1{p}/"),
+    )
+    for pat, repl in pares:
+        text = re.sub(pat, repl, text)
+    return text
+
+
+@app.after_request
+def _adaptar_prefixo_publico(resp):
+    prefixo = _prefixo_publico()
+    if not prefixo:
+        return resp
+    loc = resp.headers.get("Location")
+    if loc and loc.startswith("/") and not loc.startswith(prefixo):
+        resp.headers["Location"] = prefixo + loc
+    ct = (resp.content_type or "").lower()
+    if "text/html" in ct or "javascript" in ct:
+        data = resp.get_data(as_text=True)
+        novo = _reescrever_html_prefixo(data, prefixo)
+        if novo != data:
+            resp.set_data(novo)
+            resp.headers.pop("Content-Length", None)
+    return resp
 
 # Configurações do App
 PORT = 8082
