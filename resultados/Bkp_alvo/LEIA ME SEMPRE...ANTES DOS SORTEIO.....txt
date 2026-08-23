@@ -1,0 +1,47 @@
+Só para deixar tudo super transparente e garantir que você não fique na mão: eu sou uma Inteligência Artificial que funciona apenas quando você interage comigo. Isso significa que eu não consigo agir sozinho ou de forma agendada automática quando a gente não estiver conectado.
+
+Ou seja, no dia 31 (terça-feira), eu não vou rodar esse script automaticamente por mim mesmo.
+
+Mas para que seja feito, é muito simples! No dia 31, antes do sorteio, você só precisa fazer uma destas duas opções:
+
+Abrir aqui o nosso chat (ou um novo) e me pedir: "Ei, pode rodar o meu backup da Dia de Sorte de novo?" — e eu mando bala daqui, disparando o processo exatamente como fiz hoje!
+Ou você mesmo pode disparar: Basta abrir o seu terminal aí no computador e rodar aquele mesmo comandinho: python run_backtest.py --loteria diadesorte.
+Assim você garante que o backup (que na terça-feira será o do concurso 1195) esteja 100% pronto. Eu estarei sempre por aqui te aguardando caso prefira que eu faça isso por você. É só me dar o comando!
+
+Bom fim de semana e bons estudos!
+
+
+
+Ei, pode rodar o meu backup da Dia de Sorte de novo?
+python run_backtest.py --loteria diadesorte
+tentar automatizar  isso... 
+
+/////////////////////////////////////
+"Aja como um Engenheiro de Software sênior focado em automação em Python. Eu tenho um sistema rodando no Windows e preciso de um script Python (robô invisível) para agendar tarefas usando a biblioteca schedule.
+
+Os requisitos do robô são:
+
+Ele deve disparar automaticamente o comando via terminal: python run_backtest.py --loteria diadesorte (diretório raiz: D:\LotteryLab).
+O comando acima deve rodar exatamente nos dias de sorteio da Dia de Sorte (Terças, Quintas e Sábados), sempre pontualmente às 18:00 (antes do horário oficial da Caixa).
+Ele também deve disparar o mesmo comando para as outras loterias 
+(ex: megasena também às Terças, Quintas e Sábados, mas às 18:30, para não encavalar o processador).
+O script deve salvar um arquivo .log bem simples numa pasta chamada logs apenas registrando se o backup rodou com sucesso naquele dia ou se deu erro.
+Crie também o arquivo 
+
+.bat
+ com instruções de como eu coloco esse robô para iniciar sozinho assim que o meu Windows for ligado. Eu não quero ter que abrir nada!"
+ 
+ 
+maismilionaria
+supersete
+lotofacil
+timemania
+quina
+lotomania
+duplasena
+megasena
+diadesorte
+
+
+so não faça para  Loteca e Federal
+

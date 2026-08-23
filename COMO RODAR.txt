@@ -1,0 +1,66 @@
+Para fazer as análises pesadas (Backtesting): python run_backtest.py --loteria [nome]
+Para abrir o seu Aplicativo Web (Dashboard): python app_conferidor.py
+
+
+
+
+ACESSE:
+D:\LotteryLab
+
+e rode quais quer  comando  abaixo
+
+
+python run_backtest.py --loteria maismilionaria
+python run_backtest.py --loteria supersete
+python run_backtest.py --loteria lotofacil
+python run_backtest.py --loteria timemania
+python run_backtest.py --loteria quina
+python run_backtest.py --loteria lotomania
+python run_backtest.py --loteria duplasena
+python run_backtest.py --loteria megasena
+python run_backtest.py --loteria diadesorte
+
+
+obs: Esta seria um Backtesting
+
+
+Para um FutureTesting
+
+Faça o  seguinte:
+python app_conferidor.py
+
+
+
+
+
+http://localhost:5151/visualizacao-tubular
+
+AJUSTES NA SEÇÃO
+"JOGOS CRIADOS CONFORME ANÁLISE DE ESTUDOS ANTERIORES - MANUALMENTE"
+
+Diminua um pouco mais as colunas...
+1º	2º	3º	4º	5º	6º	7º
+Aumente um pouco mais a coluna...
+Mês
+Aumente um pouco a coluna...
+Inicial  para  que  os digitos fiquem  em uma unica linha..
+ATEÇÃO: FOQUE EM  APENAS ESTAS TRES ALTERAÇÕES O  RESTO DA LOGICA ETC NÃO  DEVE SER ALTERADO  POR NADA.. OK.. 
+
+
+Jogos de Elite - Lotofácil (100 jogos) 💸 Un: R$ 3,50 | Total: R$ 350,00 
+
+📋 Resumo das Modalidades
+
+| Modalidade   | Números                 | Aposta Mín/Máx        | Valor    | Dias          |
+|--------------|-------------------------|-----------------------|----------|---------------|
+| Mega-Sena    | 01 a 60                 | 6 / 20                | R$ 6,00  | Ter, Qui, Sáb |
+| Lotofácil    | 01 a 25                 | 15 / 20               | R$ 3,50  | Seg a Sáb     |
+| Quina        | 01 a 80                 | 5 / 15                | R$ 3,00  | Seg a Sáb     |
+| Lotomania    | 00 a 99                 | 50 fixo               | R$ 3,50  | Seg e Sáb     |
+| Timemania    | 01 a 80 + Time          | 10 fixo               | R$ 3,00  | Ter, Qui, Sáb |
+| Dupla Sena   | 01 a 50                 | 6 / 15                | R$ 3,00  | Ter, Qui, Sáb |
+| Dia de Sorte | 01 a 31 + Mês           | 7 / 15                | R$ 2,50  | Ter, Qui, Sáb |
+| Super Sete   | 7 colunas (0-9)         | 7 / 21                | R$ 3,00  | Seg, Qua, Sex |
+| Loteca       | 14 jogos (1/X/2)        | 1 coluna              | R$ 4,00  | Segunda       |
+| Federal      | Bilhete 5 dígitos       | 1 bilhete             | R$ 10,00 | Qua, Sáb      |
+| + Milionária | 6 números + 2 trevos    | 6 / 12 + 2 / 6 trevos | R$ 6,00  | Qua, Sáb      |

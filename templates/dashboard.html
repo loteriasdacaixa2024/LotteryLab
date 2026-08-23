@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LotteryLab Live - Histórico e Elite</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --gold: #fbbf24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 24px;
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .header h1 span {
+            color: var(--accent);
+        }
+
+        .header-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .sync-btn,
+        .help-global-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .sync-btn {
+            background: var(--accent);
+            color: #0f172a;
+        }
+
+        .help-global-btn {
+            background: #334155;
+            color: white;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .lottery-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid #334155;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lottery-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .lottery-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-hits {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .official-result-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .result-balls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .ball {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: #334155;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-stats {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-val {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px;
+            font-size: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        /* History Section */
+        .history-section {
+            max-width: 1400px;
+            margin: 50px auto;
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid #334155;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .lottery-select {
+            background: #0f172a;
+            color: white;
+            border: 1px solid #334155;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+            text-align: center;
+            table-layout: fixed;
+        }
+
+        .history-table th {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .history-table td {
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.3);
+        }
+
+        .history-table tr td:first-child {
+            border-radius: 12px 0 0 12px;
+        }
+
+        .history-table tr td:last-child {
+            border-radius: 0 12px 12px 0;
+        }
+
+        .hit-inline {
+            display: inline-flex;
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin: 0 2px;
+        }
+
+        .val-inline {
+            display: inline-flex;
+            width: 25px;
+            height: 25px;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            margin: 0 2px;
+            opacity: 0.5;
+        }
+
+        .stats-summary-box {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+            background: rgba(15, 23, 42, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+
+        .stat-card-val {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-card-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bet-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bet-on {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border-color: #22c55e44;
+        }
+
+        .bet-off {
+            background: rgba(148, 163, 184, 0.1);
+            color: #94a3b8;
+            border-color: #47556944;
+        }
+
+        .elite-section {
+            margin-top: 30px;
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #334155;
+        }
+
+        .elite-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .elite-game-card {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            text-align: center;
+            border: 1px solid #1e293b;
+        }
+
+        .export-btn {
+            background: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-actions">
+            <button class="help-global-btn" onclick="openGeneralHelp()">💡 Guia Rápido</button>
+            <button id="syncBtn" class="sync-btn" onclick="startGlobalSync()">🔄 Sincronizar Tudo</button>
+        </div>
+        <h1>Lottery<span>Lab</span> Live</h1>
+        <p style="color: var(--text-dim)">Acompanhamento de Assertividade em Tempo Real</p>
+    </div>
+
+    <div id="loader" class="loading">Iniciando sistema...</div>
+    <div class="dashboard-grid" id="dashboard"></div>
+
+    <div class="history-section">
+        <div class="history-header">
+            <h2 style="display: flex; align-items: center; margin:0;">
+                📊 Histórico de Assertividade
+                <span id="betIndicator" class="bet-indicator bet-off">Monitorando...</span>
+                <button onclick="openHistoryHelp()"
+                    style="background: none; border: 1px solid rgba(255,255,255,0.2); color: var(--text-dim); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 10px; font-size: 0.8rem; font-weight: bold; transition: all 0.2s;"
+                    onmouseover="this.style.color='var(--accent)'; this.style.borderColor='var(--accent)'"
+                    onmouseout="this.style.color='var(--text-dim)'; this.style.borderColor='rgba(255,255,255,0.2)'"
+                    title="Entenda esta tela">?</button>
+            </h2>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <label style="color:var(--text-dim); font-size:0.9rem;">Por página:</label>
+                <select id="pageSizeSelect" class="lottery-select" style="padding: 5px 10px;"
+                    onchange="changePageSize()">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+                <select id="lotteryHistorySelect" class="lottery-select" onchange="updateHistory()">
+                    <option value="lotofacil">Lotofácil</option>
+                    <option value="megasena">Mega-Sena</option>
+                    <option value="quina">Quina</option>
+                    <option value="diadesorte">Dia de Sorte</option>
+                    <option value="lotomania">Lotomania</option>
+                    <option value="duplasena">Dupla Sena</option>
+                    <option value="timemania">Timemania</option>
+                    <option value="supersete">Super Sete</option>
+                    <option value="maismilionaria">+Milionária</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="stats-summary-box" id="historyStats">
+            <div class="stat-card">
+                <span class="stat-card-val" id="statTotalHist">-</span>
+                <span class="stat-card-label">Concursos Analisados</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-val" id="statMediaHist">-</span>
+                <span class="stat-card-label">Média de Acertos</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-card-val" id="statMaxHist">-</span>
+                <span class="stat-card-label">Maior Acerto</span>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th style="width:100px;">Concurso</th>
+                        <th style="width:120px;">Data</th>
+                        <th>Resultado Oficial</th>
+                        <th id="extraColHeader" style="display:none; width:150px;">Extra</th>
+                        <th style="width:230px;">Performance Elite</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+            </table>
+        </div>
+        <div id="paginationControls"
+            style="display:flex; justify-content:center; gap:20px; margin-top:20px; align-items:center;">
+            <button class="export-btn" style="background:#334155; color:white;" onclick="prevPage()">&laquo;
+                Anterior</button>
+            <span id="pageIndicator" style="font-weight:600; color:var(--text-dim); font-size:0.9rem;">Página 1</span>
+            <button class="export-btn" style="background:#334155; color:white;" onclick="nextPage()">Próxima
+                &raquo;</button>
+        </div>
+
+        <div class="elite-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="eliteTitle" style="margin:0;">🎲 Jogos de Elite</h3>
+                <button class="export-btn" onclick="exportElite()">💾 Exportar .TXT</button>
+            </div>
+            <div id="eliteGrid" class="elite-grid"></div>
+        </div>
+
+        <div class="elite-section" style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin:0; display:flex; align-items:center; gap:8px;">📋 Resumo das Modalidades</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="history-table" style="text-align: center;">
+                    <thead>
+                        <tr>
+                            <th>Modalidade</th>
+                            <th>Números</th>
+                            <th>Aposta Mín/Máx</th>
+                            <th>Valor</th>
+                            <th>Dias</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-weight:600; color:#1B9A67;">Mega-Sena</td>
+                            <td>01 a 60</td>
+                            <td>6 / 20</td>
+                            <td style="font-weight:700; color:#4ade80;">R$ 6,00</td>
+                            <td>Ter, Qui, Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#c084fc;">Lotofácil</td>
+                            <td>01 a 25</td>
+                            <td>15 / 20</td>
+                            <td style="font-weight:700; color:#c084fc;">R$ 3,50</td>
+                            <td>Seg a Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#818cf8;">Quina</td>
+                            <td>01 a 80</td>
+                            <td>5 / 15</td>
+                            <td style="font-weight:700; color:#818cf8;">R$ 3,00</td>
+                            <td>Seg a Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#E68527;">Lotomania</td>
+                            <td>00 a 99</td>
+                            <td>50 fixo</td>
+                            <td style="font-weight:700; color:#fb923c;">R$ 3,50</td>
+                            <td>Seg e Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#fde047;">Timemania</td>
+                            <td>01 a 80 + Time</td>
+                            <td>10 fixo</td>
+                            <td style="font-weight:700; color:#facc15;">R$ 3,00</td>
+                            <td>Ter, Qui, Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#fb7185;">Dupla Sena</td>
+                            <td>01 a 50</td>
+                            <td>6 / 15</td>
+                            <td style="font-weight:700; color:#fb7185;">R$ 3,00</td>
+                            <td>Ter, Qui, Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#D4B31A;">Dia de Sorte</td>
+                            <td>01 a 31 + Mês</td>
+                            <td>7 / 15</td>
+                            <td style="font-weight:700; color:#fcd34d;">R$ 2,50</td>
+                            <td>Ter, Qui, Sáb</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#A9CF46;">Super Sete</td>
+                            <td>7 colunas (0-9)</td>
+                            <td>7 / 21</td>
+                            <td style="font-weight:700; color:#bef264;">R$ 3,00</td>
+                            <td>Seg, Qua, Sex</td>
+                        </tr>
+						<!--
+                        <tr>
+                            <td style="font-weight:600; color:#60a5fa;">Loteca</td>
+                            <td>14 jogos (1/X/2)</td>
+                            <td>1 coluna</td>
+                            <td style="font-weight:700; color:#93c5fd;">R$ 4,00</td>
+                            <td>Segunda</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight:600; color:#2dd4bf;">Federal</td>
+                            <td>Bilhete 5 dígitos</td>
+                            <td>1 bilhete</td>
+                            <td style="font-weight:700; color:#5eead4;">R$ 10,00</td>
+                            <td>Qua, Sáb</td>
+                        </tr>
+						-->
+						
+                        <tr>
+                            <td style="font-weight:600; color:#818cf8;">+ Milionária</td>
+                            <td>6 números + 2 trevos</td>
+                            <td>6 / 12 + 2 / 6 trevos</td>
+                            <td style="font-weight:700; color:#60a5fa;">R$ 6,00</td>
+                            <td>Qua, Sáb</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modalBody" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+        const COLOR_MAP = {
+            'megasena': '#1B9A67', 'lotofacil': '#7B1FA2', 'quina': '#260184',
+            'lotomania': '#E68527', 'timemania': '#FFF600', 'diadesorte': '#D4B31A',
+            'duplasena': '#BA184A', 'maismilionaria': '#31357C', 'supersete': '#A9CF46'
+        };
+
+        let allHistoryData = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let currentLotId = 'lotofacil';
+        let currentActiveColor = '#38bdf8';
+
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                const container = document.getElementById('dashboard');
+                const loader = document.getElementById('loader');
+
+                loader.style.display = 'none';
+                container.innerHTML = '';
+
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'lottery-card';
+                    card.style.borderTop = `4px solid ${item.cor}`;
+
+                    let ballsHtml = item.dezenas_sorteadas.map(n => {
+                        let num = String(n);
+                        // Super Sete usa apenas um dígito (0-9)
+                        if (item.loteria.toLowerCase().includes('sete') || item.slug === 'supersete') {
+                            num = parseInt(n);
+                        } else {
+                            num = num.padStart(2, '0');
+                        }
+                        return `<div class="ball" style="border-color: ${item.cor}55">${num}</div>`;
+                    }).join('');
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <div class="lottery-name">${item.loteria}</div>
+                            <div style="text-align: right;">
+                                <div class="badge-hits" style="background: ${item.cor}22; color: ${item.cor}; margin-bottom: 4px;">
+                                    #${item.ultimo_concurso}
+                                </div>
+                                <div style="color: var(--gold); font-weight: 800; font-size: 1.1rem; text-shadow: 0 0 10px #eab30844;">
+                                    ${item.maior_acerto} <span style="font-size: 0.7rem; font-weight: 400; opacity: 0.8;">PONTOS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="official-result-label">Resultado Oficial (${item.data})</div>
+                        <div class="result-balls">${ballsHtml}</div>
+                        <div class="summary-stats">
+                            <div class="stat-item">
+                                <span class="stat-val" style="color: ${item.cor}">${item.total_jogos_analisados}</span>
+                                <span class="stat-label">Jogos Elite</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-val" style="color: #4ade80">${Object.values(item.resumo_acertos).reduce((a, b) => a + b, 0)}</span>
+                                <span class="stat-label">Premiados</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function updateHistory() {
+            const select = document.getElementById('lotteryHistorySelect');
+            currentLotId = select.value;
+            const lotName = select.options[select.selectedIndex].text;
+            const historyBody = document.getElementById('historyBody');
+            currentActiveColor = COLOR_MAP[currentLotId] || '#38bdf8';
+
+            // Atualiza o título da seção de elite com destaque de cor apenas na modalidade
+            document.getElementById('eliteTitle').innerHTML = `🎲 Jogos de Elite - <span style="color: ${currentActiveColor}">${lotName}</span>`;
+
+            historyBody.innerHTML = '<tr><td colspan="5">Carregando histórico completo...</td></tr>';
+
+            try {
+                // Ao remover o limit do backend, isso trará todos os registros
+                const res = await fetch(`/api/history/${currentLotId}`);
+                const data = await res.json();
+
+                document.getElementById('statTotalHist').innerText = data.stats.total_analisado;
+                document.getElementById('statMediaHist').innerText = data.stats.media_acertos.toFixed(2);
+                document.getElementById('statMaxHist').innerText = data.stats.maior_acerto;
+
+                const indicator = document.getElementById('betIndicator');
+                if (data.stats.media_acertos >= 0.5) {
+                    indicator.className = 'bet-indicator bet-on';
+                    indicator.innerText = '🔥 Quando Apostar: AGORA (Média Alta)';
+                } else {
+                    indicator.className = 'bet-indicator bet-off';
+                    indicator.innerText = '❄️ Quando Apostar: AGUARDAR (Tendência Baixa)';
+                }
+
+                allHistoryData = data.history || [];
+                currentPage = 1;
+                renderHistoryPage();
+
+            } catch (err) { console.error(err); }
+            loadEliteGames(currentLotId);
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById('pageSizeSelect').value);
+            currentPage = 1;
+            renderHistoryPage();
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderHistoryPage();
+            }
+        }
+
+        function nextPage() {
+            const maxPage = Math.ceil(allHistoryData.length / pageSize) || 1;
+            if (currentPage < maxPage) {
+                currentPage++;
+                renderHistoryPage();
+            }
+        }
+
+        function renderHistoryPage() {
+            const historyBody = document.getElementById('historyBody');
+            historyBody.innerHTML = '';
+
+            const hasExtra = allHistoryData.some(r => r.extra);
+            const extraHeader = document.getElementById('extraColHeader');
+            if (extraHeader) {
+                extraHeader.style.display = hasExtra ? 'table-cell' : 'none';
+            }
+
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = Math.min(startIndex + pageSize, allHistoryData.length);
+            const pageData = allHistoryData.slice(startIndex, endIndex);
+
+            pageData.forEach(row => {
+                const hitsSet = new Set(row.dezenas_acertadas);
+                let resHtml = '<div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">';
+                row.resultado.forEach((n, idx) => {
+                    const isHit = (currentLotId === 'supersete') ? hitsSet.has(idx) : hitsSet.has(n);
+                    const num = (currentLotId === 'supersete') ? n : String(n).padStart(2, '0');
+                    resHtml += `<span class="${isHit ? 'hit-inline' : 'val-inline'}" style="${isHit ? `background:${currentActiveColor}; color:#fff; font-weight:700;` : ''}">${num}</span>`;
+                });
+                resHtml += '</div>';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${row.concurso}</td>
+                    <td style="font-family:'JetBrains Mono'">${row.data}</td>
+                    <td>${resHtml}</td>
+                    ${hasExtra ? `<td style="color:var(--accent); font-size:0.8rem">${row.extra}</td>` : ''}
+                    <td style="font-weight:700; color:${currentActiveColor}">${row.acertos}</td>
+                `;
+                historyBody.appendChild(tr);
+            });
+
+            const maxPage = Math.ceil(allHistoryData.length / pageSize) || 1;
+            document.getElementById('pageIndicator').innerText = `Página ${currentPage} de ${maxPage}`;
+        }
+
+        async function loadEliteGames(lotId) {
+            const grid = document.getElementById('eliteGrid');
+            const select = document.getElementById('lotteryHistorySelect');
+            const lotName = select.options[select.selectedIndex].text;
+            const activeColor = COLOR_MAP[lotId] || '#38bdf8';
+            const title = document.getElementById('eliteTitle');
+            const section = document.querySelector('.elite-section');
+
+            // Refinamento Visual Dinâmico
+            section.style.borderColor = activeColor + '88';
+            title.style.color = 'var(--text)'; // Mantém o texto base na cor padrão
+
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center">Carregando apostas...</div>';
+            try {
+                const res = await fetch(`/api/elite/${lotId}`);
+                const data = await res.json();
+                const games = data.games || [];
+                const price = data.price || 0;
+                const total = games.length * price;
+
+                grid.innerHTML = games.length ? '' : '<div style="grid-column:1/-1; text-align:center">Nenhum jogo encontrado.</div>';
+
+                // Atualiza o título com a modalidade, contador e VALORES
+                title.innerHTML = `
+                    🎲 Jogos de Elite - <span style="color: ${activeColor}; text-shadow: 0 0 10px ${activeColor}44;">${lotName}</span> 
+                    <small style="color: var(--text-dim); font-size: 0.8rem; margin-left: 10px;">
+                        (${games.length} jogos) 
+                        <span style="color: var(--gold); margin-left: 15px;">
+                            💸 Un: R$ ${price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} 
+                            | Total: R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                    </small>
+                `;
+
+                games.forEach(game => {
+                    const div = document.createElement('div');
+                    div.className = 'elite-game-card';
+                    div.style.borderColor = activeColor + '44'; // Borda do card sutil
+                    div.innerText = game.join(' ');
+                    grid.appendChild(div);
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        function exportElite() {
+            const lotId = document.getElementById('lotteryHistorySelect').value;
+            window.location.href = `/api/export-elite/${lotId}`;
+        }
+
+        async function startGlobalSync() {
+            if (!confirm("Isso irá atualizar todos os resultados e backtests. Continuar?")) return;
+            const btn = document.getElementById('syncBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Processando...';
+            try {
+                const res = await fetch('/api/sync-all', { method: 'POST' });
+                const data = await res.json();
+                alert(data.status);
+            } catch (err) { alert("Erro ao sincronizar."); }
+            setTimeout(() => { btn.disabled = false; btn.innerHTML = '🔄 Sincronizar Tudo'; }, 5000);
+        }
+
+        function openGeneralHelp() {
+            const modal = document.getElementById('helpModal');
+            document.getElementById('modalBody').innerHTML = `
+                <h3 style="color:var(--accent)">Guia do Dashboard</h3>
+                <p><strong>Quando Apostar:</strong> Baseado na média histórica. "AGORA" indica que a sua elite está em um ciclo de alta assertividade.</p>
+                <p><strong>Jogos de Elite:</strong> Apostas filtradas pelo laboratório que tiveram os melhores desempenhos no passado.</p>
+                <p><strong>Exportar .TXT:</strong> Gera um arquivo formatado para conferidores ou para registro direto.</p>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function openHistoryHelp() {
+            const modal = document.getElementById('helpModal');
+            document.getElementById('modalBody').innerHTML = `
+                <h3 style="color:var(--accent); margin-top:0;">Como funciona o Histórico de Assertividade?</h3>
+                
+                <div style="color: var(--text); font-size: 0.95rem; line-height: 1.6;">
+                    <p style="margin-top:0;"><strong>1. O Motor (Backtest Automático):</strong><br>
+                    O sistema pega os <strong>Top 100 melhores jogos</strong> da filtragem (sua "Elite") e cruza contra os <strong>últimos 200 sorteios oficiais</strong> para saber: <em>"Como minha elite teria se saído neles?"</em></p>
+                    
+                    <p><strong>2. Métricas do Topo:</strong><br>
+                    &bull; <span style="color:var(--accent)">Concursos Analisados:</span> Número de sorteios oficiais testados.<br>
+                    &bull; <span style="color:var(--accent)">Média de Acertos:</span> Em média, quantos pontos a elite garantiu em todos eles.<br>
+                    &bull; <span style="color:var(--accent)">Maior Acerto:</span> Qual foi a maior pontuação cravada por pelo menos uma combinação nesses testes.</p>
+
+                    <p><strong>3. Performance Elite (Tabela):</strong><br>
+                    Este número mostra o <strong>maior acerto absoluto</strong> alcançado pela lista naquele concurso específico. Se marcou <em>"6"</em>, significa que pelo menos um dos 100 jogos teria vencido o prêmio se você tivesse jogado nele.</p>
+
+                    <p style="margin-bottom:0;"><strong>4. O sinal "Quando Apostar":</strong><br>
+                    Se a Média de Acertos for <strong>&ge; 0.5</strong>, o sistema exibe o sinal verde <span style="display:inline-block; padding:2px 6px; background:rgba(34,197,94,0.2); color:#4ade80; border-radius:10px; font-size:0.75rem; font-weight:bold;">🔥 AGORA (Média Alta)</span>, indicando um momento quente. Caso contrário, exibe <span style="display:inline-block; padding:2px 6px; background:rgba(148,163,184,0.1); color:#94a3b8; border-radius:10px; font-size:0.75rem; font-weight:bold;">❄️ AGUARDAR</span>, sugerindo que aquele lote deve ser refeito ou aguardar melhor fase.</p>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function openWelcomePopup() {
+            if (sessionStorage.getItem('welcomeShown')) return;
+            sessionStorage.setItem('welcomeShown', 'true');
+
+            const modal = document.getElementById('helpModal');
+            document.getElementById('modalBody').innerHTML = `
+                <h3 style="color:var(--accent); margin-top:0; font-size:1.4rem;">Simplificando sua rotina em 2 Passos a partir d'agora</h3>
+                
+                <div style="color: var(--text); font-size: 1rem; line-height: 1.6;">
+                    <p style="margin-bottom:10px;"><strong>&#10145; Fazer Diariamente:</strong><br>
+                    Deixe a tela via web (porta 8082) viva ou a abra cedo.</p>
+                    
+                    <p style="margin-bottom:20px;"><strong>&#10145; Mudar Estratégias (Apostar pesadas ou Mudar Motor de Prova):</strong><br>
+                    Rode o seu *.py</p>
+                    
+                    <div style="background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                        <span style="color:var(--text-dim); font-size: 0.8rem; text-transform:uppercase; letter-spacing:1px; font-weight:bold;">Guia de Comandos</span>
+                        
+                        <div style="margin-top:10px;">
+                            <span style="font-size: 0.85rem; color: #f8fafc; font-weight:600;">Análises Pesadas (Backtesting):</span><br>
+                            <code style="display:inline-block; padding:3px 8px; background:#0f172a; border-radius:6px; color:#4ade80; border:1px solid #1e293b; margin-top:3px; font-size: 0.9rem;">python run_backtest.py --loteria [nome]</code>
+                        </div>
+                        
+                        <div style="margin-top:15px;">
+                            <span style="font-size: 0.85rem; color: #f8fafc; font-weight:600;">Aplicativo Web (Dashboard):</span><br>
+                            <code style="display:inline-block; padding:3px 8px; background:#0f172a; border-radius:6px; color:#38bdf8; border:1px solid #1e293b; margin-top:3px; font-size: 0.9rem;">python app_conferidor.py</code>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 25px;">
+                    <button onclick="closeModal()" style="background: var(--accent); color: #0f172a; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='brightness(1)'">Entendido</button>
+                </div>
+            `;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('helpModal').style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.className === 'modal') closeModal(); };
+
+        openWelcomePopup();
+        loadStats();
+        updateHistory();
+        setInterval(() => { loadStats(); updateHistory(); }, 60000);
+    </script>
+</body>
+
+</html>
